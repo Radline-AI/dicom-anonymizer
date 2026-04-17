@@ -12,6 +12,7 @@ dependencies = [
     "gooey>=1.0.8",
     "colored==1.4.4",
     "wxpython>=4.2.0",
+    "six",
 ]
 
 [build-system]
