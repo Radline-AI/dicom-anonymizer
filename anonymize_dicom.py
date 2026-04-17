@@ -25,9 +25,9 @@ Additionally retained in --ai-mode:
   - ManufacturerModelName   (0008,1090)  <- also on PS 3.15 list
   - MagneticFieldStrength   (0018,0087)
   - SoftwareVersions        (0018,1020)
-  - ProtocolName            (0018,1030)  <- also on PS 3.15 list (scrubbed)
-  - SeriesDescription       (0018,103E)  <- also on PS 3.15 list (scrubbed)
-  - StudyDescription        (0008,1030)  <- also on PS 3.15 list (scrubbed)
+  - ProtocolName            (0018,1030)  <- also on PS 3.15 list
+  - SeriesDescription       (0018,103E)  <- also on PS 3.15 list
+  - StudyDescription        (0008,1030)  <- also on PS 3.15 list
   - Modality                (0008,0060)
   - BodyPartExamined        (0018,0015)
 
@@ -356,11 +356,12 @@ AI_RETAIN_TAGS: dict[tuple[int, int], str] = {
     (0x0008, 0x1090): "ManufacturerModelName",  # <- also on PS 3.15 list
     (0x0018, 0x0087): "MagneticFieldStrength",
     (0x0018, 0x1020): "SoftwareVersions",
-    (0x0018, 0x1030): "ProtocolName",  # <- also on PS 3.15 list (scrubbed)
-    (0x0018, 0x103E): "SeriesDescription",  # <- also on PS 3.15 list (scrubbed)
-    (0x0008, 0x1030): "StudyDescription",  # <- also on PS 3.15 list (scrubbed)
+    (0x0018, 0x1030): "ProtocolName",  # <- also on PS 3.15 list
+    (0x0018, 0x103E): "SeriesDescription",  # <- also on PS 3.15 list
+    (0x0008, 0x1030): "StudyDescription",  # <- also on PS 3.15 list
     (0x0008, 0x0060): "Modality",
     (0x0018, 0x0015): "BodyPartExamined",
+    (0x0020, 0x0010): "StudyID",  # <- also on PS 3.15 list
 }
 
 # Dynamically computed intersection — tags that appear on the PS 3.15 removal
@@ -756,12 +757,12 @@ def anonymize(
         # retaining clinical tokens (sequence names, anatomical terms).
         active_remove_tags = PS315_TAGS_TO_REMOVE - _AI_OVERRIDE_TAGS.keys()
 
-        if hasattr(ds, "ProtocolName"):
-            ds.ProtocolName = _scrub_text(str(ds.ProtocolName))
-        if hasattr(ds, "SeriesDescription"):
-            ds.SeriesDescription = _scrub_text(str(ds.SeriesDescription))
-        if hasattr(ds, "StudyDescription"):
-            ds.StudyDescription = _scrub_text(str(ds.StudyDescription))
+        # if hasattr(ds, "ProtocolName"):
+        #     ds.ProtocolName = _scrub_text(str(ds.ProtocolName))
+        # if hasattr(ds, "SeriesDescription"):
+        #     ds.SeriesDescription = _scrub_text(str(ds.SeriesDescription))
+        # if hasattr(ds, "StudyDescription"):
+        #     ds.StudyDescription = _scrub_text(str(ds.StudyDescription))
     else:
         active_remove_tags = PS315_TAGS_TO_REMOVE
 
