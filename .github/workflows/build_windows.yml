@@ -23,7 +23,7 @@ jobs:
 
       - name: Build EXE
         run: |
-          pyinstaller --onefile --windowed --name "DICOM-Anonymizer" --collect-data gooey anonymize_dicom.py
+          pyinstaller --onefile --windowed --name "DICOM-Anonymizer" --collect-data gooey --hidden-import=six anonymize_dicom.py
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
