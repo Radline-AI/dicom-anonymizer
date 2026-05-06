@@ -366,6 +366,7 @@ AI_RETAIN_TAGS: dict[tuple[int, int], str] = {
     (0x0028, 0x0011): "Columns",
     # Spatial reference (required for 3D Slicer and other viewers)
     (0x0020, 0x0052): "FrameOfReferenceUID",  # <- also on PS 3.15 list
+    (0x0020, 0x0013): "InstanceNumber",  # Required for proper slice ordering
     # Device / acquisition (bias analysis, domain shift)
     (0x0008, 0x0070): "Manufacturer",
     (0x0008, 0x1090): "ManufacturerModelName",  # <- also on PS 3.15 list
@@ -724,7 +725,8 @@ def anonymize_recursive(ds, uid_map: dict, active_remove_tags: set, date_offset:
             continue
 
         # Remap all UI-VR values (not reversible after process exit).
-        if elem.VR == "UI" and elem.value:
+        # Exception: Keep FrameOfReferenceUID unchanged (required for 3D Slicer)
+        if elem.VR == "UI" and elem.value and tag != (0x0020, 0x0052):
             try:
                 ds[tag].value = remap_uid(str(elem.value), uid_map)
             except Exception:
