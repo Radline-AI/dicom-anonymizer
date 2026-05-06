@@ -364,6 +364,8 @@ AI_RETAIN_TAGS: dict[tuple[int, int], str] = {
     (0x0020, 0x0032): "ImagePositionPatient",
     (0x0028, 0x0010): "Rows",
     (0x0028, 0x0011): "Columns",
+    # Spatial reference (required for 3D Slicer and other viewers)
+    (0x0020, 0x0052): "FrameOfReferenceUID",  # <- also on PS 3.15 list
     # Device / acquisition (bias analysis, domain shift)
     (0x0008, 0x0070): "Manufacturer",
     (0x0008, 0x1090): "ManufacturerModelName",  # <- also on PS 3.15 list
