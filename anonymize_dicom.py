@@ -995,7 +995,7 @@ def run_process(
     terminal_font_color="#212529",
     terminal_panel_color="#ffffff",
     header_height=80,
-    richtext_controls=True,
+    richtext_controls=False,
 )
 def main():
     parser = GooeyParser(
