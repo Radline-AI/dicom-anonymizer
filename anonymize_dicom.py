@@ -885,10 +885,13 @@ def run_process(
             errors.append((file.name, str(e)))
             continue
 
-        pid = (
-            str(getattr(ds, "PatientID", "") or "").strip()
-            or file.relative_to(input_path).parts[0]
-        )
+        # Use folder name as primary PatientID source (more reliable than DICOM tag)
+        relative = file.relative_to(input_path)
+        if len(relative.parts) > 0:
+            pid = relative.parts[0]
+        else:
+            # Fallback to DICOM PatientID if file is directly in input_path
+            pid = str(getattr(ds, "PatientID", "") or "").strip() or "UNKNOWN"
         if pid not in patient_map:
             patient_map[pid] = {
                 "anon_id": generate_anon_id(pid, prefix),
@@ -925,7 +928,11 @@ def run_process(
             )
             continue
 
-        out = output_path / file.relative_to(input_path)
+        # Rebuild output path with anonymized ID as root folder
+        relative = file.relative_to(input_path)
+        parts = list(relative.parts)
+        parts[0] = anon_id  # Replace original patient folder with anon_id
+        out = output_path / Path(*parts)
         out.parent.mkdir(parents=True, exist_ok=True)
         ds.save_as(str(out))
 
