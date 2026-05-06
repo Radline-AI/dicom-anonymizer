@@ -927,8 +927,9 @@ def run_process(
             }
         )
 
-        if i % 50 == 0 or i == len(files):
-            print(f"Progress: {i}/{len(files)}")
+        # Update progress bar for Gooey (requires specific format)
+        progress = int((i / len(files)) * 100)
+        print(f"Processing file {i}/{len(files)} ({progress}%)")
 
     # ── Summary ───────────────────────────────────────────────────────────────
     saved = len(files) - len(errors) - len(burned_skipped)
@@ -985,7 +986,9 @@ def run_process(
     program_name="DICOM Anonymizer",
     language="english",
     default_size=(700, 650),
-    progress_indicator_type="smooth",
+    progress_regex=r"^Processing file (\d+)/(\d+)",
+    progress_expr="x[0] / x[1] * 100",
+    disable_progress_bar_animation=False,
     header_bg_color="#2c7be5",
     body_bg_color="#f8f9fa",
     footer_bg_color="#e9ecef",
