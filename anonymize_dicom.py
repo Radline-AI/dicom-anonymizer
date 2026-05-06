@@ -74,12 +74,19 @@ Changelog:
 import csv
 import hashlib
 import re
+import sys
 from datetime import datetime, timedelta
 from pathlib import Path
 
 import pydicom
 import pydicom.uid
 from gooey import Gooey, GooeyParser
+
+# Force unbuffered output for Gooey with --noconsole on Windows
+if sys.stdout is not None:
+    sys.stdout.reconfigure(line_buffering=True)
+if sys.stderr is not None:
+    sys.stderr.reconfigure(line_buffering=True)
 
 SCRIPT_VERSION = "1.0.0"
 
@@ -836,25 +843,25 @@ def run_process(
     mapping_path.mkdir(parents=True, exist_ok=True)
 
     mode_label = "AI-ready (Retain Device+Acquisition)" if ai_mode else "Standard"
-    print(f"Input:   {input_path}")
-    print(f"Output:  {output_path}")
-    print(f"Mapping: {mapping_path}")
-    print(f"Mode:    {mode_label}")
-    print("")
+    print(f"Input:   {input_path}", flush=True)
+    print(f"Output:  {output_path}", flush=True)
+    print(f"Mapping: {mapping_path}", flush=True)
+    print(f"Mode:    {mode_label}", flush=True)
+    print("", flush=True)
     print(
-        f"AI override tags: {len(_AI_OVERRIDE_TAGS)} PS3.15-listed tags retained in ai_mode:"
+        f"AI override tags: {len(_AI_OVERRIDE_TAGS)} PS3.15-listed tags retained in ai_mode:", flush=True
     )
     for tag, name in sorted(_AI_OVERRIDE_TAGS.items()):
-        print(f"  ({tag[0]:04X},{tag[1]:04X})  {name}")
-    print("")
-    print("Searching for DICOM files...")
+        print(f"  ({tag[0]:04X},{tag[1]:04X})  {name}", flush=True)
+    print("", flush=True)
+    print("Searching for DICOM files...", flush=True)
 
     files = find_dicoms(input_path)
     if not files:
-        print("No DICOM files found.")
+        print("No DICOM files found.", flush=True)
         return
 
-    print(f"Found {len(files)} files.\n")
+    print(f"Found {len(files)} files.\n", flush=True)
 
     uid_map: dict = {}
     patient_map: dict = {}
@@ -899,7 +906,7 @@ def run_process(
         if burned_in:
             burned_skipped.append(file.name)
             sop = getattr(ds, "SOPInstanceUID", "Unknown")
-            print(f"SKIP (BurnedInAnnotation): {file.name} [{sop}]")
+            print(f"SKIP (BurnedInAnnotation): {file.name} [{sop}]", flush=True)
             audit_rows.append(
                 {
                     "file": file.name,
@@ -929,25 +936,25 @@ def run_process(
 
         # Update progress bar for Gooey (requires specific format)
         progress = int((i / len(files)) * 100)
-        print(f"Processing file {i}/{len(files)} ({progress}%)")
+        print(f"Processing file {i}/{len(files)} ({progress}%)", flush=True)
 
     # ── Summary ───────────────────────────────────────────────────────────────
     saved = len(files) - len(errors) - len(burned_skipped)
-    print(f"\nDone: {saved}/{len(files)} files saved")
+    print(f"\nDone: {saved}/{len(files)} files saved", flush=True)
     if burned_skipped:
         print(
-            f"Skipped (BurnedInAnnotation=YES): {len(burned_skipped)} files — manual review required"
+            f"Skipped (BurnedInAnnotation=YES): {len(burned_skipped)} files — manual review required", flush=True
         )
     if age_computed:
-        print(f"Age computed from dates: {age_computed} files")
+        print(f"Age computed from dates: {age_computed} files", flush=True)
     if age_clamped:
-        print(f"Age clamped to 090Y (HIPAA, >=90 years): {age_clamped} files")
+        print(f"Age clamped to 090Y (HIPAA, >=90 years): {age_clamped} files", flush=True)
     if age_missing:
-        print(f"Age unavailable: {age_missing} files")
+        print(f"Age unavailable: {age_missing} files", flush=True)
     if errors:
-        print(f"Errors: {len(errors)} files")
+        print(f"Errors: {len(errors)} files", flush=True)
         for name, err in errors[:10]:
-            print(f"  {name}: {err}")
+            print(f"  {name}: {err}", flush=True)
 
     # ── Write confidential files to mapping_path (outside output folder) ──────
     ts = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -972,11 +979,11 @@ def run_process(
         burned_file = mapping_path / f"_burned_in_review_{ts}.txt"
         with open(burned_file, "w", encoding="utf-8") as f:
             f.write("\n".join(burned_skipped))
-        print(f"Burned-in list: {burned_file}")
+        print(f"Burned-in list: {burned_file}", flush=True)
 
-    print(f"\nPatient mapping: {mapping_file}")
-    print(f"Audit log:       {audit_file}")
-    print("CONFIDENTIAL — do not distribute alongside anonymized DICOMs.\n")
+    print(f"\nPatient mapping: {mapping_file}", flush=True)
+    print(f"Audit log:       {audit_file}", flush=True)
+    print("CONFIDENTIAL — do not distribute alongside anonymized DICOMs.\n", flush=True)
 
 
 # ── GUI ───────────────────────────────────────────────────────────────────────
