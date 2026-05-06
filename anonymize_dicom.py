@@ -82,11 +82,17 @@ import pydicom
 import pydicom.uid
 from gooey import Gooey, GooeyParser
 
-# Force unbuffered output for Gooey with --noconsole on Windows
+# Force unbuffered output for Gooey with UTF-8 encoding on Windows
 if sys.stdout is not None:
-    sys.stdout.reconfigure(line_buffering=True)
+    try:
+        sys.stdout.reconfigure(encoding='utf-8', errors='replace', line_buffering=True)
+    except (AttributeError, ValueError):
+        pass
 if sys.stderr is not None:
-    sys.stderr.reconfigure(line_buffering=True)
+    try:
+        sys.stderr.reconfigure(encoding='utf-8', errors='replace', line_buffering=True)
+    except (AttributeError, ValueError):
+        pass
 
 SCRIPT_VERSION = "1.0.0"
 
